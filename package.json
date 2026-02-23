@@ -1,0 +1,33 @@
+{
+  "name": "amazon-dsp-api-internal-tool",
+  "version": "1.0.0",
+  "description": "Internal agency platform for Amazon DSP - auth, reporting, optimization",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx watch src/server.ts",
+    "db:migrate": "node dist/db/migrate.js",
+    "reporting:sync": "node dist/jobs/reporting-sync.js",
+    "guidance:sync": "node dist/jobs/guidance-sync.js",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.6.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-session": "^1.18.1",
+    "helmet": "^8.0.0",
+    "node-fetch": "^3.3.2",
+    "uuid": "^11.0.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/express": "^5.0.0",
+    "@types/express-session": "^1.18.0",
+    "@types/node": "^22.10.1",
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
