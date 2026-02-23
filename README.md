@@ -1,44 +1,52 @@
 # Amazon DSP API Internal Tool
 
-Internal agency platform for Amazon DSP: OAuth auth, reporting ingestion, and optimization automation.
+Internal agency platform for Amazon DSP: OAuth auth, reporting ingestion, optimization automation, and a read-only API for external chat/LLM apps.
 
-## Setup
+## Quick start
 
-1. **Register LwA app**: Create a Login with Amazon app in [Amazon Developer Console](https://developer.amazon.com) and apply for Amazon Ads API access.
-2. **Configure env**: Copy `.env.example` to `.env` and fill in:
+1. **Register LwA app** in [Amazon Developer Console](https://developer.amazon.com) and apply for Amazon Ads API access.
+2. **Configure env**: Copy `.env.example` to `.env` and set:
    - `LWA_CLIENT_ID`, `LWA_CLIENT_SECRET`, `AMAZON_ADS_API_CLIENT_ID`
-   - `OAUTH_REDIRECT_URI` (must match Allowed Return URLs in LwA Web Settings)
-   - `TOKEN_ENCRYPTION_KEY` (32-byte hex: `openssl rand -hex 32`)
+   - `OAUTH_REDIRECT_URI` (match Allowed Return URLs in LwA)
+   - `TOKEN_ENCRYPTION_KEY` (`openssl rand -hex 32`)
    - `SESSION_SECRET`
-3. **Install and run**:
+3. **Run**:
    ```bash
-   npm install
-   npm run build
-   npm run db:migrate
-   npm run dev
+   npm install && npm run build && npm run db:migrate && npm run dev
    ```
-4. Open `http://localhost:3000`, click "Link Amazon Ads Account", complete OAuth.
+4. Open `http://localhost:3000`, link your Amazon Ads account via OAuth.
 
-## API Endpoints
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| [docs/USAGE_AND_CAPABILITIES.md](docs/USAGE_AND_CAPABILITIES.md) | Full usage, capabilities, and configuration |
+| [docs/ASSISTANT_INTEGRATION.md](docs/ASSISTANT_INTEGRATION.md) | Assistant Tool API for external chat/LLM apps |
+| [docs/RUNBOOK.md](docs/RUNBOOK.md) | Re-auth, recovery, and operations |
+
+## Capabilities summary
+
+- **Auth** — OAuth 2.0 via LwA, encrypted token storage
+- **DSP hierarchy** — Entity → advertiser → campaign → line item
+- **Metrics** — Reporting sync, data quality checks
+- **Guidance** — Recommendations + Quick Action execution
+- **Assistant API** — Read-only endpoints for external chat apps (`/api/assistant/tools/*`)
+
+## Key endpoints
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /auth/authorize` | Start OAuth flow |
-| `GET /auth/callback` | OAuth callback (handled by LwA redirect) |
-| `POST /auth/unlink` | Revoke linked account |
-| `GET /api/profiles` | List advertiser profiles |
-| `GET /api/metrics?profile_id=&start_date=&end_date=` | Performance metrics |
-| `GET /api/guidance?profile_id=&status=` | Optimization recommendations |
-| `POST /api/guidance/:actionId/execute` | Execute a Quick Action (body: `{ profile_id }`) |
-| `GET /api/metrics/quality?profile_id=&start_date=&end_date=` | Data quality check (missing dates, anomalies) |
-| `POST /api/campaigns/orders` | Create order (body: `{ profile_id, name, budget? }`) |
-| `POST /api/campaigns/lineItems` | Create line item (body: `{ profile_id, order_id, name, budget?, frequency_cap? }`) |
+| `GET /auth/authorize` | Start OAuth |
+| `GET /api/advertisers/:id/hierarchy` | Campaigns + line items |
+| `GET /api/guidance?profile_id=&status=` | Recommendations |
+| `POST /api/guidance/:actionId/execute` | Execute Quick Action |
+| `GET /api/assistant/tools/*` | Read-only API for external apps |
 
-## Scheduled Jobs
+## NPM scripts
 
-- **Reporting sync**: `npm run reporting:sync` — Pull DSP reports into `metrics` table. Run daily.
-- **Guidance sync**: `npm run guidance:sync` — Fetch recommendations. Run every 6h.
-
-## Runbook
-
-See [docs/RUNBOOK.md](docs/RUNBOOK.md) for re-auth, revoked access, and failed action recovery.
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Run dev server |
+| `npm run reporting:sync` | Sync DSP reports (daily) |
+| `npm run guidance:sync` | Sync recommendations (every 6h) |
+| `npm run test:assistant` | Test assistant API |

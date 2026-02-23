@@ -16,6 +16,7 @@ import { executeQuickAction } from "../../optimization/quick-actions.js";
 import { auditLog } from "../../auth/audit.js";
 import { createOrder, createLineItem } from "../../campaigns/api.js";
 import { runDataQualityCheck } from "../../reporting/data-quality.js";
+import { assistantToolsRouter } from "./assistant-tools.js";
 
 export const apiRouter = Router();
 
@@ -50,6 +51,8 @@ apiRouter.use((req, res, next) => {
   req.tokenId = tokenId;
   next();
 });
+
+apiRouter.use("/assistant/tools", assistantToolsRouter);
 
 apiRouter.get("/profiles", (req, res) => {
   const tokenId = req.tokenId!;

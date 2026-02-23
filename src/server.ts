@@ -3,7 +3,7 @@ import session from "express-session";
 import helmet from "helmet";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { config } from "./config.js";
+import { config, corsOrigins } from "./config.js";
 import { authRouter } from "./api/routes/auth.js";
 import { apiRouter } from "./api/routes/api.js";
 import { syncAdvertisersForToken } from "./ads/advertiser-sync.js";
@@ -26,6 +26,20 @@ app.use(
 );
 
 app.use("/auth", authRouter);
+app.use("/api", (req, res, next) => {
+  const origin = req.headers.origin;
+  if (corsOrigins.length > 0 && origin && corsOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  }
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+    return;
+  }
+  next();
+});
 app.use("/api", apiRouter);
 
 app.get("/", (_req, res) => {

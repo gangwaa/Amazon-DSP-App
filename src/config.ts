@@ -8,6 +8,9 @@ const required = (key: string): string => {
 
 const optional = (key: string, def: string): string => process.env[key] ?? def;
 
+/** Comma-separated origins for CORS (e.g. https://chat.example.com). Required for cross-origin external apps. */
+export const corsOrigins = (process.env.CORS_ORIGINS ?? "").split(",").filter(Boolean);
+
 export const config = {
   lwaClientId: required("LWA_CLIENT_ID"),
   lwaClientSecret: required("LWA_CLIENT_SECRET"),
